@@ -1,15 +1,19 @@
 import 'dotenv/config';
-import { Client, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { ChatInputCommandInteraction, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { Commands } from './commands';
+import { MyClient } from './classes/MyClient';
+
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+const APPLICATION_ID = process.env.APPLICATION_ID;
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+export const client = new MyClient({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });
 
 // Log in to Discord with your client's token
-client.login(process.env.DISCORD_TOKEN);
+client.login(DISCORD_TOKEN);
 
 // Construct and prepare an instance of the REST module
-const rest = new REST().setToken(process.env.DISCORD_TOKEN);
+const rest = new REST().setToken(DISCORD_TOKEN);
 
 /*
  * Client Ready
@@ -19,18 +23,17 @@ client.once(Events.ClientReady, async (readyClient) => {
 		return;
 	}
 
-	await client.application.commands.set(Commands);
-
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
 	try {
-		console.log(`Started updating ${Commands.length} application (/) commands.`);
+		console.log('Registering the following commands:');
+		console.log(`[${Array.from(Commands.keys()).join(', ')}]`);
 
 		// Registers the commands in the Discord server
 		// This process can take up to an hour for results to register on server
-		await rest.put(Routes.applicationCommands(process.env.APPLICATION_ID), { body: Commands });
+		await rest.put(Routes.applicationCommands(APPLICATION_ID), { body: Array.from(Commands.values()).map((command) => command.slashCommandBuilder.toJSON()) });
 
-		console.log(`Finished updating ${Commands.length} application (/) commands.`);
+		console.log(`Finished registering commands.`);
 	} catch (error) {
 		console.error(error);
 	}
@@ -39,10 +42,10 @@ client.once(Events.ClientReady, async (readyClient) => {
 /*
  * Listens to chat commands and executes run() command
  */
-client.on(Events.InteractionCreate, async (interaction) => {
+client.on(Events.InteractionCreate, async (interaction: ChatInputCommandInteraction<'cached'>) => {
 	if (!interaction.isChatInputCommand()) return;
 
-	const command = Commands.find((command) => command.name === interaction.commandName);
+	const command = Commands.get(interaction.commandName);
 
 	if (!command) {
 		console.error(`No command matching ${interaction.commandName} was found.`);

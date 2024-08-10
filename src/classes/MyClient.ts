@@ -1,7 +1,6 @@
 import { YouTubePlugin } from '@distube/youtube';
 import { Client, ClientOptions } from 'discord.js';
 import DisTube from 'distube';
-import { GUILD_ID } from '..';
 
 export class MyClient extends Client {
 	distube = new DisTube(this, {

@@ -1,13 +1,11 @@
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { DisTubeCommand } from '../../interfaces/Command';
+import { Command, DisTubeCommand } from '../../interfaces/Command';
 import { Commands } from '..';
 import { MyClient } from '../../classes/MyClient';
 
-export class PlayCommand extends DisTubeCommand {
-	override readonly inVoiceChannel = true;
-
+export class PlayCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder()
-		.setName('play')
+		.setName(DisTubeCommand.PLAY)
 		.setDescription('Plays a video from YouTube')
 		.addStringOption((opt) => opt.setName('input').setDescription('A YouTube video or playlist URL, or search terms').setRequired(true))
 		.addBooleanOption((opt) => opt.setName('skip').setDescription('Skip the current song').setRequired(false))

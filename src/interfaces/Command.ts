@@ -6,10 +6,13 @@ export abstract class Command {
 	abstract run(client: MyClient, interaction: CommandInteraction<'cached'>): Awaitable<any>;
 }
 
-export abstract class DisTubeCommand extends Command {
-	readonly inVoiceChannel: boolean = true;
-
-	constructor() {
-		super();
-	}
+export enum DisTubeCommand {
+	CLEAR = 'CLEAR',
+	LOOP = 'LOOP',
+	PLAY = 'PLAY',
+	PREVIOUS = 'PREVIOUS',
+	QUEUE = 'QUEUE',
+	SHUFFLE = 'SHUFFLE',
+	SKIP = 'SKIP',
+	STOP = 'STOP',
 }

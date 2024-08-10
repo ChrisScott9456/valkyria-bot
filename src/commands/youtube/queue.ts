@@ -8,46 +8,34 @@ export class QueueCommand extends DisTubeCommand {
 
 	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
 		const queue = client.distube.getQueue(interaction);
-		if (!queue) return; // Handled by playing property
-		const song = queue.songs[0];
+		if (!queue) return interaction.reply('Nothing in the queue currently');
+
+		const song = queue.songs[0]; // The currently playing song
 		await interaction.reply({
 			embeds: [
 				new EmbedBuilder()
 					.setColor('Blurple')
-					.setTitle('DisTube')
+					.setTitle('Now Playing')
+					.setThumbnail(song.thumbnail)
+					.setAuthor({ name: song.user.displayName, iconURL: song.user.avatarURL() })
 					.setDescription(
 						[
-							`**Current:** \`${song.name || song.url}\` - \`${queue.formattedCurrentTime}\`/\`${song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration}\`\n`,
-							`**Up next**\n${
-								queue.songs
-									.slice(1, 10)
-									.map((song, i) => `**${i + 1}.** \`${song.name || song.url}\``)
-									.join('\n') || 'None'
-							}`,
+							// Song name and hyperlink
+							`### **[${song.name || song.url}](${song.url})**\n`,
+							// Display current time left on current song from total song length
+							`\`${queue.formattedCurrentTime}\`/\`${song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration}\``,
+							// If there are any other songs in the queue, display list
+							queue.songs.slice(1).length > 0
+								? `### **Queue:**\n${
+										queue.songs
+											.slice(1) // Ignore current song
+											.map((song, i) => `**${i + 1}.** [${song.name || song.url}](${song.url}) \`[${song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration}]\``)
+											.join('\n') || 'None'
+								  }\n`
+								: null,
 						].join('\n')
 					)
-					.addFields(
-						{
-							name: 'Volume',
-							value: `${queue.volume}%`,
-							inline: true,
-						},
-						{
-							name: 'Autoplay',
-							value: `${queue.autoplay ? 'On' : 'Off'}`,
-							inline: true,
-						},
-						{
-							name: 'Loop',
-							value: `${queue.repeatMode === RepeatMode.QUEUE ? 'Queue' : queue.repeatMode === RepeatMode.SONG ? 'Song' : 'Off'}`,
-							inline: true,
-						},
-						{
-							name: 'Filters',
-							value: `${queue.filters.names.join(', ') || 'Off'}`,
-							inline: false,
-						}
-					),
+					.setFooter({ text: `Source: ${song.uploader.name}` }),
 			],
 		});
 	}

@@ -9,7 +9,7 @@ export class PlayCommand extends DisTubeCommand {
 	readonly slashCommandBuilder = new SlashCommandBuilder()
 		.setName('play')
 		.setDescription('Plays a video from YouTube')
-		.addStringOption((opt) => opt.setName('input').setDescription('A supported URL or a search query').setRequired(true))
+		.addStringOption((opt) => opt.setName('input').setDescription('A YouTube video or playlist URL, or search terms').setRequired(true))
 		.addBooleanOption((opt) => opt.setName('skip').setDescription('Skip the current song').setRequired(false))
 		.addIntegerOption((opt) => opt.setName('position').setDescription('Position will be added to the queue').setRequired(false));
 
@@ -18,7 +18,9 @@ export class PlayCommand extends DisTubeCommand {
 		const skip = interaction.options.getBoolean('skip', false) ?? false;
 		const position = interaction.options.getInteger('position', false) ?? undefined;
 		const vc = interaction.member?.voice?.channel;
-		if (!vc) return interaction.reply('You must be in a voice channel to use this command!'); // Handled by inVoiceChannel property
+
+		if (!vc) return interaction.reply('You must be in a voice channel to use this command!');
+
 		await client.distube
 			.play(vc, input, {
 				skip,

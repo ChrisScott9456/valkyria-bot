@@ -3,8 +3,9 @@ import { ChatInputCommandInteraction, Events, GatewayIntentBits, REST, Routes } 
 import { Commands } from './commands';
 import { MyClient } from './classes/MyClient';
 
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-const APPLICATION_ID = process.env.APPLICATION_ID;
+export const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+export const APPLICATION_ID = process.env.APPLICATION_ID;
+export const GUILD_ID = process.env.GUILD_ID;
 
 // Create a new client instance
 export const client = new MyClient({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates] });

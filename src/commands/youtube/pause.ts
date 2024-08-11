@@ -21,7 +21,7 @@ export class PauseCommand extends Command {
 		}
 
 		const song = queue.songs[0];
-		replyWrapper(
+		await replyWrapper(
 			{
 				embeds: [
 					new EmbedBuilder()

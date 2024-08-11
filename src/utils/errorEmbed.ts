@@ -5,6 +5,7 @@ export enum EmbedErrorMessages {
 	EMPTY_QUEUE = 'There are no songs in the queue!',
 	VOICE_CHANNEL_REQUIRED = 'You must be in a voice channel to use this command!',
 	NO_PREVIOUS_SONGS = 'There are no previous songs in the queue to play!',
+	SEEK_ERROR = 'You cannot seek to a timestamp outside the length of the song!',
 }
 
 export class EmbedError extends Error {

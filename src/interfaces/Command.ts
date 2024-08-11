@@ -8,12 +8,12 @@ export abstract class Command {
 }
 
 export enum DisTubeCommand {
-	CLEAR = 'clear',
 	LOOP = 'loop',
 	PAUSE = 'pause',
 	PLAY = 'play',
 	PREVIOUS = 'previous',
 	QUEUE = 'queue',
+	SEEK = 'seek',
 	SHUFFLE = 'shuffle',
 	SKIP = 'skip',
 	STOP = 'stop',

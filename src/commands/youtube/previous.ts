@@ -16,7 +16,7 @@ export class PreviousCommand extends Command {
 		await queue.previous();
 
 		const song = queue.previousSongs[0];
-		replyWrapper(
+		await replyWrapper(
 			{
 				embeds: [
 					new EmbedBuilder()

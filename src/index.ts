@@ -1,9 +1,12 @@
 import 'dotenv/config';
-import { ChatInputCommandInteraction, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Events as DistubeEvents } from 'distube';
 import { Commands } from './commands';
 import { MyClient } from './classes/MyClient';
-import { EmbedError, EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
+import { EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
 import { replyWrapper } from './utils/replyWrapper';
+import { getProgressBar } from './utils/getProgressBar';
+import { DisTubeCommand } from './interfaces/Command';
 
 export const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 export const APPLICATION_ID = process.env.APPLICATION_ID;
@@ -62,4 +65,22 @@ client.on(Events.InteractionCreate, async (interaction: ChatInputCommandInteract
 
 		console.error(error);
 	}
+});
+
+/*
+ * Listens to when the current distube queue changes songs
+ */
+client.distube.on(DistubeEvents.PLAY_SONG, (queue, song) => {
+	// Display current song
+});
+
+/*
+ * Listens to and logs any errors that occur
+ */
+client.on(Events.Error, (error) => {
+	console.error(error);
+});
+
+client.distube.on(DistubeEvents.ERROR, (error) => {
+	console.error(error);
 });

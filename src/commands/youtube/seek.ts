@@ -5,17 +5,23 @@ import { replyWrapper } from '../../utils/replyWrapper';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 import { Commands } from '..';
 
-export class ShuffleCommand extends Command {
-	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.SHUFFLE).setDescription('Shuffles the current queue of songs.');
+export class SeekCommand extends Command {
+	readonly slashCommandBuilder = new SlashCommandBuilder()
+		.setName(DisTubeCommand.SEEK)
+		.setDescription('Seeks to a current time within the current song.')
+		.addNumberOption((option) => option.setName('time').setDescription('The time to seek (in seconds)').setMinValue(0).setRequired(true));
 
 	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
 		const queue = client.distube.getQueue(interaction);
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
 
-		await queue.shuffle();
+		const time = interaction.options.getNumber('time', true);
+		if (time > queue.songs[0].duration) throw new EmbedError(EmbedErrorMessages.SEEK_ERROR);
+
+		await queue.seek(time);
 		await replyWrapper(
 			{
-				embeds: [new EmbedBuilder().setColor('Blurple').setTitle('Shuffled!')],
+				embeds: [new EmbedBuilder().setColor('Blurple').setTitle('Seek')],
 			},
 			interaction
 		);

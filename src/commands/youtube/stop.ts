@@ -13,7 +13,7 @@ export class StopCommand extends Command {
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
 
 		await queue.stop();
-		replyWrapper(
+		await replyWrapper(
 			{
 				embeds: [new EmbedBuilder().setColor('Blurple').setTitle('Stopped').setDescription('Cleared the queue.')],
 			},

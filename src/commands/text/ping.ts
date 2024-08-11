@@ -7,6 +7,6 @@ export class PingCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder().setName('ping').setDescription('Pong!');
 
 	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
-		replyWrapper('Pong!', interaction);
+		await replyWrapper('Pong!', interaction);
 	}
 }

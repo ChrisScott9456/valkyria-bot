@@ -111,9 +111,5 @@ export class QueueCommand extends Command {
 
 			if (!collectorFlag) reaction.users.remove(user);
 		});
-
-		queueCollector.on('end', (collected) => {
-			interaction.channel.send('End Collector');
-		});
 	}
 }

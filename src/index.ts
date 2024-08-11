@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { ChatInputCommandInteraction, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { Commands } from './commands';
 import { MyClient } from './classes/MyClient';
+import { EmbedError, EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
+import { replyWrapper } from './utils/replyWrapper';
 
 export const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 export const APPLICATION_ID = process.env.APPLICATION_ID;
@@ -56,11 +58,8 @@ client.on(Events.InteractionCreate, async (interaction: ChatInputCommandInteract
 	try {
 		await command.run(client, interaction);
 	} catch (error) {
+		await replyWrapper(errorEmbed(error.embedMessage || EmbedErrorMessages.GENERAL_ERROR), interaction);
+
 		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
 	}
 });

@@ -1,34 +1,23 @@
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../../interfaces/Command';
+import { Command, DisTubeCommand } from '../../interfaces/Command';
 import { MyClient } from '../../classes/MyClient';
 import { replyWrapper } from '../../utils/replyWrapper';
-import { emptyQueue } from '../../utils/emptyQueue';
+import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 
 export class StopCommand extends Command {
 	public aliases: string[] = ['clear'];
-	readonly slashCommandBuilder = new SlashCommandBuilder().setName('stop').setDescription('Stops playing');
+	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.STOP).setDescription('Stops playing and clears the queue.');
 
 	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
 		const queue = client.distube.getQueue(interaction);
-		if (!queue) return replyWrapper(emptyQueue(), interaction);
+		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
 
-		const song = client.distube.getQueue(interaction).songs[0];
-
-		try {
-			await client.distube.stop(interaction);
-			replyWrapper(
-				{
-					embeds: [
-						new EmbedBuilder()
-							.setColor('Blurple')
-							.setTitle('Stopped')
-							.setDescription(`**[${song.name || song.url}](${song.url})**\n`),
-					],
-				},
-				interaction
-			);
-		} catch (e) {
-			console.error(e);
-		}
+		await queue.stop();
+		replyWrapper(
+			{
+				embeds: [new EmbedBuilder().setColor('Blurple').setTitle('Stopped').setDescription('Cleared the queue.')],
+			},
+			interaction
+		);
 	}
 }

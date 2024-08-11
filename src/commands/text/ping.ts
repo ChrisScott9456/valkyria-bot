@@ -1,11 +1,12 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/Command';
+import { MyClient } from '../../classes/MyClient';
+import { replyWrapper } from '../../utils/replyWrapper';
 
-// export class PingCommand extends Command {
-// 	readonly name = 'ping';
-// 	readonly slashCommandBuilder = new SlashCommandBuilder().setName('ping').setDescription('Pong!');
+export class PingCommand extends Command {
+	readonly slashCommandBuilder = new SlashCommandBuilder().setName('ping').setDescription('Pong!');
 
-// 	run = async (interaction: CommandInteraction) => {
-// 		await interaction.reply('Pong!');
-// 	};
-// }
+	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
+		replyWrapper('Pong!', interaction);
+	}
+}

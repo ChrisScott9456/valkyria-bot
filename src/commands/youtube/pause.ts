@@ -3,31 +3,25 @@ import { Command, DisTubeCommand } from '../../interfaces/Command';
 import { MyClient } from '../../classes/MyClient';
 import { replyWrapper } from '../../utils/replyWrapper';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
-import { Commands } from '..';
 
-//TODO - Add skipping to specific place in queue
-export class SkipCommand extends Command {
-	public aliases: string[] = ['next'];
-	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.SKIP).setDescription('Skips to the next song.');
+export class PauseCommand extends Command {
+	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.PAUSE).setDescription('Pauses or unpauses the current song.');
 
 	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
 		const queue = client.distube.getQueue(interaction);
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
 
-		const song = queue.songs[0];
+		let title = 'Paused';
 
-		let title = 'Skipped';
-
-		// If the current song is the last in the queue, stop playing
-		// Otherwise, skip song
-		if (!client.distube.getQueue(interaction).songs[1]) {
-			await client.distube.stop(interaction);
-			title = 'Stopped';
+		if (!queue.paused) {
+			await queue.pause();
 		} else {
-			await client.distube.skip(interaction);
+			title = 'Unpaused';
+			await queue.resume();
 		}
 
-		await replyWrapper(
+		const song = queue.songs[0];
+		replyWrapper(
 			{
 				embeds: [
 					new EmbedBuilder()
@@ -38,10 +32,5 @@ export class SkipCommand extends Command {
 			},
 			interaction
 		);
-
-		//! Execute /queue command if queue not empty
-		if (title === 'Skipped') {
-			Commands.get('queue').run(client, interaction);
-		}
 	}
 }

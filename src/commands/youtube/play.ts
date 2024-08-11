@@ -8,13 +8,11 @@ export class PlayCommand extends Command {
 		.setName(DisTubeCommand.PLAY)
 		.setDescription('Plays a video from YouTube')
 		.addStringOption((opt) => opt.setName('input').setDescription('A YouTube video or playlist URL, or search terms').setRequired(true))
-		.addBooleanOption((opt) => opt.setName('skip').setDescription('Skip the current song').setRequired(false))
-		.addIntegerOption((opt) => opt.setName('position').setDescription('Position will be added to the queue').setRequired(false));
+		.addBooleanOption((opt) => opt.setName('skip').setDescription('Skip the current song?').setRequired(false));
 
 	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
 		const input = interaction.options.getString('input', true);
 		const skip = interaction.options.getBoolean('skip', false) ?? false;
-		const position = interaction.options.getInteger('position', false) ?? undefined;
 		const vc = interaction.member?.voice?.channel;
 
 		if (!vc) return interaction.reply('You must be in a voice channel to use this command!');
@@ -22,7 +20,6 @@ export class PlayCommand extends Command {
 		await client.distube
 			.play(vc, input, {
 				skip,
-				position,
 				textChannel: interaction.channel ?? undefined,
 				member: interaction.member,
 				metadata: { interaction },

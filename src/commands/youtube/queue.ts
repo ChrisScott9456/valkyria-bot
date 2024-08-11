@@ -3,6 +3,7 @@ import { Command, DisTubeCommand } from '../../interfaces/Command';
 import { MyClient } from '../../classes/MyClient';
 import { getProgressBar } from '../../utils/getProgressBar';
 import { Commands } from '..';
+import { emptyQueue } from '../../utils/emptyQueue';
 
 let queueCollector: ReactionCollector;
 
@@ -16,7 +17,7 @@ export class QueueCommand extends Command {
 		}
 
 		const queue = client.distube.getQueue(interaction);
-		if (!queue) return interaction.reply('Nothing in the queue currently');
+		if (!queue) return interaction.reply(emptyQueue());
 
 		const song = queue.songs[0]; // The currently playing song
 
@@ -52,21 +53,26 @@ export class QueueCommand extends Command {
 
 		const reply = await interaction.fetchReply();
 
-		['⏮', '⏯', '⏭', '🔀', '🔁'].forEach((reaction) => {
+		['⏮', '⏹', '⏯', '⏭', '🔀', '🔁'].forEach((reaction) => {
 			reply.react(reaction);
 		});
 
-		const collectorFilter = (reaction, user) => {
-			return user.id !== reply.author.id;
-		};
-
-		queueCollector = reply.createReactionCollector({ filter: collectorFilter, time: song.duration * 1000 });
+		queueCollector = reply.createReactionCollector({
+			filter: (reaction, user) => {
+				return user.id !== reply.author.id;
+			},
+			time: song.duration * 1000,
+		});
 
 		queueCollector.on('collect', (reaction, user) => {
 			switch (reaction.emoji.toString()) {
 				case '⏮':
 					Commands.get(DisTubeCommand.PREVIOUS).run(client, interaction);
 					interaction.channel.send('Previous');
+					break;
+				case '⏹':
+					Commands.get(DisTubeCommand.STOP).run(client, interaction);
+					interaction.channel.send('Stop');
 					break;
 				case '⏯':
 					Commands.get(DisTubeCommand.PLAY).run(client, interaction);

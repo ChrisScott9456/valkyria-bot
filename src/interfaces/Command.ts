@@ -1,18 +1,19 @@
-import { Awaitable, CommandInteraction, ContextMenuCommandBuilder, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
+import { Awaitable, CommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
 import { MyClient } from '../classes/MyClient';
 
 export abstract class Command {
-	abstract readonly slashCommandBuilder: SlashCommandBuilder | ContextMenuCommandBuilder | SlashCommandSubcommandsOnlyBuilder | SlashCommandOptionsOnlyBuilder;
+	abstract readonly slashCommandBuilder: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
 	abstract run(client: MyClient, interaction: CommandInteraction<'cached'>): Awaitable<any>;
+	public aliases: string[];
 }
 
 export enum DisTubeCommand {
-	CLEAR = 'CLEAR',
-	LOOP = 'LOOP',
-	PLAY = 'PLAY',
-	PREVIOUS = 'PREVIOUS',
-	QUEUE = 'QUEUE',
-	SHUFFLE = 'SHUFFLE',
-	SKIP = 'SKIP',
-	STOP = 'STOP',
+	CLEAR = 'clear',
+	LOOP = 'loop',
+	PLAY = 'play',
+	PREVIOUS = 'previous',
+	QUEUE = 'queue',
+	SHUFFLE = 'shuffle',
+	SKIP = 'skip',
+	STOP = 'stop',
 }

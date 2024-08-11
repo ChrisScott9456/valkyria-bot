@@ -1,19 +1,19 @@
 import 'dotenv/config';
-import { ChatInputCommandInteraction, EmbedBuilder, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { ChatInputCommandInteraction, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { Events as DistubeEvents } from 'distube';
 import { Commands } from './commands';
 import { MyClient } from './classes/MyClient';
 import { EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
 import { replyWrapper } from './utils/replyWrapper';
-import { getProgressBar } from './utils/getProgressBar';
-import { DisTubeCommand } from './interfaces/Command';
 
 export const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 export const APPLICATION_ID = process.env.APPLICATION_ID;
 export const GUILD_ID = process.env.GUILD_ID;
 
 // Create a new client instance
-export const client = new MyClient({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions] });
+export const client = new MyClient({
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions],
+});
 
 // Log in to Discord with your client's token
 client.login(DISCORD_TOKEN);

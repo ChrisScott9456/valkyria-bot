@@ -43,7 +43,12 @@ export class QueueCommand extends Command {
 									? `### **Queue:**\n${
 											queue.songs
 												.slice(1) // Ignore current song
-												.map((song, i) => `**${i + 1}.** [${song.name || song.url}](${song.url}) \`[${song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration}]\``)
+												.map(
+													(song, i) =>
+														`**${i + 1}.** [${song.name || song.url}](${song.url}) \`[${
+															song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration
+														}]\``
+												)
 												.join('\n') || 'None'
 									  }\n`
 									: null,

@@ -1,0 +1,24 @@
+status: 'online' # 'online', 'idle', 'dnd', 'invisible'
+#afk: true
+activities:
+    [{ name: 'ActivityName', type: 0, state: 'ActivityState' }]
+    # Type Enums:
+    # -----------
+    # Playing {name}
+    # Playing = 0
+    #
+    # Streaming {name}
+    # Streaming = 1
+    #
+    # Listening to {name}
+    # Listening = 2
+    #
+    # Watching {name}
+    # Watching = 3
+    #
+    # {emoji} {state}
+    # Custom = 4
+    #
+    # Competing in {name}
+    # Competing = 5
+#shardId: 00000

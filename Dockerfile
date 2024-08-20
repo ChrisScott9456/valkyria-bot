@@ -4,7 +4,7 @@ FROM node:18-alpine
 RUN apk add --no-cache python3 py3-pip build-base
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /
 
 # Copy package.json and package-lock.json
 COPY package*.json ./

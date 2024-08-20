@@ -7,7 +7,10 @@
 		"start": "tsc && nodemon",
 		"prod": "tsc && index.ts",
 		"build": "tsc",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"docker-build": "docker build -t discord-bot .",
+		"docker-image": "docker save -o discord-bot.tar discord-bot:latest",
+		"docker-run": "docker run --env-file .env -d --name my-discord-bot discord-bot"
 	},
 	"author": "ChrisScott9456",
 	"license": "ISC",
@@ -18,6 +21,7 @@
 		"discord.js": "^14.15.3",
 		"distube": "^5.0.2",
 		"dotenv": "^16.4.5",
+		"js-yaml": "^4.1.0",
 		"sodium-native": "^4.1.1",
 		"typescript": "^5.5.4"
 	},

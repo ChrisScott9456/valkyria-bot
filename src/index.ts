@@ -15,9 +15,6 @@ export const client = new MyClient({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions],
 });
 
-// Log in to Discord with your client's token
-client.login(DISCORD_TOKEN);
-
 // Construct and prepare an instance of the REST module
 const rest = new REST().setToken(DISCORD_TOKEN);
 

@@ -5,10 +5,8 @@ import { Commands } from './commands';
 import { MyClient } from './classes/MyClient';
 import { EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
 import { replyWrapper } from './utils/replyWrapper';
-
-export const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-export const APPLICATION_ID = process.env.APPLICATION_ID;
-export const GUILD_ID = process.env.GUILD_ID;
+import { createPollJob, endPollJob } from './utils/poll';
+import { APPLICATION_ID, DISCORD_TOKEN } from './lib/envVariables';
 
 // Create a new client instance
 export const client = new MyClient({
@@ -29,6 +27,9 @@ client.once(Events.ClientReady, async (readyClient) => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 
 	try {
+		createPollJob.start();
+		endPollJob.start();
+
 		console.log('Registering the following commands:');
 		console.log(`[${Array.from(Commands.keys()).join(', ')}]`);
 

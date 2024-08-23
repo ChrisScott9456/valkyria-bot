@@ -1,0 +1,5 @@
+requiredVotes: 4 # Required number of votes to pass movie night poll
+failureVotes: 1 # Number of "No" votes that will cause movie night to be cancelled
+dayOfWeek: 5 # Number 1-7 that determines which night movie night should take place (Ex: 5 is Friday)
+hour: 0 # Number 0-23 that determines the hour movie night should take place (Ex: 0 is 12AM)
+pollLength: 22 # Number 1-23 How many hours before the poll should end? (Ex: 22 is 2hrs before movie night)

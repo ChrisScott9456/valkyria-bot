@@ -1,10 +1,10 @@
 import { YouTubePlugin } from '@distube/youtube';
 import { Client, ClientOptions, PresenceData } from 'discord.js';
 import DisTube from 'distube';
-import { DISCORD_TOKEN } from '..';
 
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
+import { DISCORD_TOKEN } from '../lib/envVariables';
 
 // Load and parse the YAML file
 const fileContents = fs.readFileSync('config/richPresence.yaml', 'utf8');

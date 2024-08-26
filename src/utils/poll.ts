@@ -5,7 +5,7 @@ import { CronJob } from 'cron';
 
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import { MovieNightConfig } from '../interfaces/MovieNightConfig';
+import { MovieNightConfig } from '../interfaces/MovieNight';
 import { MOVIE_NIGHT_ROLE, MOVIE_NIGHT_TEXT_CHANNEL, MOVIE_NIGHT_VOICE_CHANNEL } from '../lib/envVariables';
 
 // Load and parse the YAML file

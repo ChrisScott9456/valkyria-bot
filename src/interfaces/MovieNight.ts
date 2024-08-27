@@ -1,3 +1,5 @@
+import { Snowflake } from 'discord.js';
+
 export interface MovieNightConfig {
 	requiredVotes: number;
 	failureVotes: number;
@@ -46,6 +48,7 @@ export interface TMDBMovie {
 }
 
 export interface Movie {
+	User: Snowflake;
 	Title: string;
 	'Release Date': string;
 	Rating: string;

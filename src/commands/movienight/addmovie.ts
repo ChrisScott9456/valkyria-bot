@@ -6,8 +6,7 @@ import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 import axios from 'axios';
 import { OMDB_API_KEY, TMDB_API_KEY } from '../../lib/envVariables';
 import { IMDBMovie, Movie, TMDBMovie } from '../../interfaces/MovieNight';
-
-const MovieList: Movie[] = [];
+import { db, DB_TABLES } from '../../lib/knex';
 
 export class AddMovieCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder()
@@ -53,6 +52,7 @@ export class AddMovieCommand extends Command {
 		).data;
 
 		let outMovie: Movie = {
+			User: interaction.member.id,
 			Title: tmdbResponse.title,
 			'Release Date': tmdbResponse.release_date,
 			Rating: `${tmdbResponse.vote_average}`,
@@ -81,6 +81,7 @@ export class AddMovieCommand extends Command {
 		// Map to IMDB Response if no TMDB Response
 		if (!tmdbResponse || (imdbId && tmdbResponse.imdb_id !== imdbId)) {
 			outMovie = {
+				User: interaction.member.id,
 				Title: imdbResponse.Title,
 				'Release Date': imdbResponse.Released,
 				Rating: imdbResponse.imdbRating,
@@ -95,7 +96,9 @@ export class AddMovieCommand extends Command {
 			};
 		}
 
-		MovieList.push(outMovie);
+		await db<Movie>(DB_TABLES.MOVIE_LIST).insert(outMovie);
+
+		delete outMovie.User;
 
 		await replyWrapper(
 			{
@@ -106,9 +109,12 @@ export class AddMovieCommand extends Command {
 						.setImage(outMovie.Poster)
 						.setAuthor({ name: interaction.member.displayName, iconURL: interaction.member.avatarURL() })
 						.setDescription(
-							Object.entries(outMovie)
-								.map((param) => `### **${param[0]}:**\n ${param[1]}`)
-								.join('\n')
+							[
+								`### **User:**\n <@${interaction.member.id}>\n`,
+								Object.entries(outMovie)
+									.map((param) => `### **${param[0]}:**\n ${param[1]}`)
+									.join('\n'),
+							].join('')
 						),
 				],
 			},

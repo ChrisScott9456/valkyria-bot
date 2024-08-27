@@ -1,5 +1,6 @@
 import { Command } from '../interfaces/Command';
 import { AddMovieCommand } from './movienight/addmovie';
+import { MovieListCommand } from './movienight/movielist';
 import { PingCommand } from './text/ping';
 import { LoopCommand } from './youtube/loop';
 import { PauseCommand } from './youtube/pause';
@@ -14,7 +15,7 @@ import { StopCommand } from './youtube/stop';
 export const Commands = new Map<string, Command>();
 
 // Register all commands in the Commands Map
-[AddMovieCommand, LoopCommand, PauseCommand, PingCommand, PlayCommand, PreviousCommand, QueueCommand, SeekCommand, ShuffleCommand, SkipCommand, StopCommand].forEach((Command) => {
+[AddMovieCommand, MovieListCommand, LoopCommand, PauseCommand, PingCommand, PlayCommand, PreviousCommand, QueueCommand, SeekCommand, ShuffleCommand, SkipCommand, StopCommand].forEach((Command) => {
 	const command = new Command();
 	Commands.set(command.slashCommandBuilder.name, command);
 

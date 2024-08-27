@@ -7,6 +7,7 @@ import { EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
 import { replyWrapper } from './utils/replyWrapper';
 import { createPollJob, endPollJob } from './utils/poll';
 import { APPLICATION_ID, DISCORD_TOKEN } from './lib/envVariables';
+import { createTables } from './lib/knex';
 
 // Create a new client instance
 export const client = new MyClient({
@@ -29,6 +30,7 @@ client.once(Events.ClientReady, async (readyClient) => {
 	try {
 		createPollJob.start();
 		endPollJob.start();
+		await createTables();
 
 		console.log('Registering the following commands:');
 		console.log(`[${Array.from(Commands.keys()).join(', ')}]`);

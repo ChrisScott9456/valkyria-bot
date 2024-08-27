@@ -48,6 +48,7 @@ export interface TMDBMovie {
 }
 
 export interface Movie {
+	id?: number;
 	User: Snowflake;
 	Title: string;
 	'Release Date': string;

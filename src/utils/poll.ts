@@ -5,8 +5,9 @@ import { CronJob } from 'cron';
 
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import { MovieNightConfig } from '../interfaces/MovieNight';
+import { Movie, MovieNightConfig } from '../interfaces/MovieNight';
 import { MOVIE_NIGHT_ROLE, MOVIE_NIGHT_TEXT_CHANNEL, MOVIE_NIGHT_VOICE_CHANNEL } from '../lib/envVariables';
+import { db, DB_TABLES } from '../lib/knex';
 
 // Load and parse the YAML file
 const fileContents = fs.readFileSync('config/movienight.yaml', 'utf8');
@@ -22,8 +23,11 @@ const getChannel = async () => (await client.channels.fetch(MOVIE_NIGHT_TEXT_CHA
 
 let lastPoll: Message;
 
+// const now = new Date(); //! Testing
+
 export const createPollJob = new CronJob(
 	`0 ${config.hour} * * ${config.dayOfWeek - 1}`, // Create poll 24hrs before movie night time
+	// new Date(now.getTime() + 3 * 1000), //! Testing
 	async () => {
 		const channel = await getChannel();
 		await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
@@ -50,6 +54,7 @@ const endPollTime = config.hour + config.pollLength;
 
 export const endPollJob = new CronJob(
 	`1 ${endPollTime > 23 ? endPollTime - 24 : endPollTime} * * ${config.dayOfWeek}`, // Check results 1 minute after poll ends (config.pollLength hours after start)
+	// new Date(now.getTime() + 20 * 1000), //! Testing
 	async () => {
 		const channel = await getChannel();
 		await lastPoll.poll.end();
@@ -80,7 +85,14 @@ export const endPollJob = new CronJob(
 		} else {
 			await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
 
-			const title = 'SOME TITLE';
+			const movies = await db<Movie>(DB_TABLES.MOVIE_LIST).select('*');
+
+			let selectedMovie: Movie; // The random movie to be selected from the list
+
+			if (movies.length > 0) {
+				const randomIndex = Math.floor(Math.random() * movies.length);
+				selectedMovie = movies[randomIndex];
+			}
 
 			const event: GuildScheduledEventCreateOptions = {
 				name: `Movie Night - ${timestampFormatted('ll')}`,
@@ -88,12 +100,22 @@ export const endPollJob = new CronJob(
 				scheduledEndTime: timestamp().add(3, 'hours').toISOString(),
 				privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
 				entityType: GuildScheduledEventEntityType.Voice,
-				description: `Tonight's movie is: ${title}`,
+				description: [
+					`### **Tonight's Movie:**\n **${selectedMovie.Title} (${selectedMovie['Release Date'].slice(0, 4)})**`,
+					`### **User:**\n <@${selectedMovie.User}>`,
+					`### **Runtime:**\n ${selectedMovie.Runtime}`,
+					`### **Synopsis:**\n ${selectedMovie.Synopsis}`,
+					`### **IMDB Link:**\n ${selectedMovie['IMDB Link']}`,
+					`### **TMDB Link:**\n ${selectedMovie['TMDB Link']}`,
+				].join('\n'),
 				channel: MOVIE_NIGHT_VOICE_CHANNEL,
+				image: selectedMovie.Poster,
 			};
 
 			const createdEvent = await channel.guild.scheduledEvents.create(event);
 			channel.send(createdEvent.url);
+
+			await db<Movie>(DB_TABLES.MOVIE_LIST).where({ id: selectedMovie.id }).delete();
 		}
 	},
 	null,

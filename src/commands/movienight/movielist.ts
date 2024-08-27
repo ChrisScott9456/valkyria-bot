@@ -20,7 +20,8 @@ export class MovieListCommand extends Command {
 			for (const movie of movies) {
 				const fields = [
 					`### **User:**\n <@${interaction.member.id}>`,
-					`### **Title:**\n ${movie.Title}`,
+					`### **Title:**\n ${movie.Title} (${movie['Release Date'].slice(0, 4)})`,
+					`### **Release Date:**\n ${movie['Release Date']}`,
 					`### **Runtime:**\n ${movie.Runtime}`,
 					`### **Synopsis:**\n ${movie.Synopsis}`,
 					`### **IMDB Link:**\n ${movie['IMDB Link']}`,

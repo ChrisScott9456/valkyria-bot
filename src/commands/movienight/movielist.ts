@@ -19,7 +19,7 @@ export class MovieListCommand extends Command {
 		if (movies.length > 0) {
 			for (const movie of movies) {
 				const fields = [
-					`### **User:**\n <@${interaction.member.id}>`,
+					`### **User:**\n <@${movie.User}>`,
 					`### **Title:**\n ${movie.Title} (${movie['Release Date'].slice(0, 4)})`,
 					`### **Release Date:**\n ${movie['Release Date']}`,
 					`### **Runtime:**\n ${movie.Runtime}`,
@@ -35,7 +35,6 @@ export class MovieListCommand extends Command {
 								.setColor('Blurple')
 								.setTitle('Movie List')
 								.setThumbnail(movie.Poster)
-								.setAuthor({ name: interaction.member.displayName, iconURL: interaction.member.avatarURL() })
 								.setDescription((simple ? fields.slice(0, 2) : fields).join('\n')), // If simple = true, only display user and title
 						],
 					},
@@ -45,13 +44,7 @@ export class MovieListCommand extends Command {
 		} else {
 			await replyWrapper(
 				{
-					embeds: [
-						new EmbedBuilder()
-							.setColor(0xff0000)
-							.setTitle('Movie List')
-							.setAuthor({ name: interaction.member.displayName, iconURL: interaction.member.avatarURL() })
-							.setDescription('The current movie list is empty!'),
-					],
+					embeds: [new EmbedBuilder().setColor(0xff0000).setTitle('Movie List').setDescription('The current movie list is empty!')],
 				},
 				interaction
 			);

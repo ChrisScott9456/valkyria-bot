@@ -8,6 +8,9 @@ import { replyWrapper } from '../../utils/replyWrapper';
 
 let queueCollector: ReactionCollector;
 
+//TODO - Replace reactions with "Buttons"
+//TODO - Do setup so it will show the current song playing when it changes songs
+
 export class QueueCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.QUEUE).setDescription('Lists the current queue of songs.');
 

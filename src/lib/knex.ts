@@ -1,5 +1,4 @@
 import knex, { Knex } from 'knex';
-import { Movie } from '../interfaces/MovieNight';
 
 const knexConfig: Knex.Config = {
 	client: 'sqlite3', // Or another database client like 'pg', 'mysql', etc.
@@ -13,6 +12,7 @@ export const db = knex(knexConfig);
 
 export enum DB_TABLES {
 	MOVIE_LIST = 'movielist',
+	MOVIE_NIGHT_POLL = 'movienightpoll',
 }
 
 export async function createTables() {
@@ -34,6 +34,11 @@ export async function createTables() {
 			table.string('Backdrop');
 			table.string('IMDB Link');
 			table.string('TMDB Link');
+		});
+
+		await db.schema.createTable(DB_TABLES.MOVIE_NIGHT_POLL, (table) => {
+			table.integer('id').primary();
+			table.string('messageid');
 		});
 	}
 }

@@ -19,6 +19,7 @@ export class MovieListCommand extends Command {
 		if (movies.length > 0) {
 			for (const movie of movies) {
 				const fields = [
+					`### **ID:** ${movie.id}`,
 					`### **User:**\n <@${movie.User}>`,
 					`### **Title:**\n ${movie.Title} (${movie['Release Date'].slice(0, 4)})`,
 					`### **Release Date:**\n ${movie['Release Date']}`,

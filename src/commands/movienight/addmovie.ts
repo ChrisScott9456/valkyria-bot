@@ -96,7 +96,7 @@ export class AddMovieCommand extends Command {
 			};
 		}
 
-		await db<Movie>(DB_TABLES.MOVIE_LIST).insert(outMovie);
+		const id = await db<Movie>(DB_TABLES.MOVIE_LIST).insert(outMovie);
 
 		delete outMovie.User;
 
@@ -110,6 +110,7 @@ export class AddMovieCommand extends Command {
 						.setAuthor({ name: interaction.member.displayName, iconURL: interaction.member.avatarURL() })
 						.setDescription(
 							[
+								`### **ID:** ${id[0]}\n`,
 								`### **User:**\n <@${interaction.member.id}>\n`,
 								Object.entries(outMovie)
 									.map((param) => `### **${param[0]}:**\n ${param[1]}`)

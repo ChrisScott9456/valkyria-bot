@@ -5,4 +5,3 @@ build
 example
 
 config
-dev.sqlite3

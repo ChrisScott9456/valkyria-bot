@@ -3,7 +3,7 @@ import knex, { Knex } from 'knex';
 const knexConfig: Knex.Config = {
 	client: 'sqlite3', // Or another database client like 'pg', 'mysql', etc.
 	connection: {
-		filename: './dev.sqlite3', // Adjust the filename or connection details as needed
+		filename: './config/db.sqlite3', // Adjust the filename or connection details as needed
 	},
 	useNullAsDefault: true, // This is specific to SQLite; adjust for other databases
 };

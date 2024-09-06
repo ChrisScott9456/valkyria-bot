@@ -50,10 +50,10 @@ export const createPollJob = new CronJob(
 	'America/New_York'
 );
 
-const endPollTime = config.hour + config.pollLength;
+const endPollTime = config.hour + config.pollLength - 1;
 
 export const endPollJob = new CronJob(
-	`1 ${endPollTime > 23 ? endPollTime - 24 : endPollTime} * * ${config.dayOfWeek}`, // Check results 1 minute after poll ends (config.pollLength hours after start)
+	`59 ${endPollTime > 23 ? endPollTime - 24 : endPollTime} * * ${config.dayOfWeek}`, // Check results 1 minute before poll ends (config.pollLength hours after start)
 	// new Date(now.getTime() + 10 * 1000), //! Testing
 	async () => {
 		const channel = await getChannel();

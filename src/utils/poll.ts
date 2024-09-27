@@ -13,7 +13,7 @@ import { db, DB_TABLES } from '../lib/knex';
 const fileContents = fs.readFileSync('config/movienight.yaml', 'utf8');
 const config: MovieNightConfig = yaml.load(fileContents);
 
-const timestamp = () => moment().startOf('week').day(config.dayOfWeek).hour(config.hour);
+const timestamp = () => moment().utcOffset(config.utcOffset).startOf('week').day(config.dayOfWeek).hour(config.hour);
 
 const timestampFormatted = (format = 'LLLL') => {
 	return `${timestamp().format(format)} EST`;

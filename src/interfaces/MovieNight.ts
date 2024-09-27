@@ -6,6 +6,7 @@ export interface MovieNightConfig {
 	dayOfWeek: number;
 	hour: number;
 	pollLength: number;
+	utcOffset: number;
 }
 
 export interface IMDBMovie {

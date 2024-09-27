@@ -21,7 +21,7 @@ const timestampFormatted = (format = 'LLLL') => {
 
 const getChannel = async () => (await client.channels.fetch(MOVIE_NIGHT_TEXT_CHANNEL)) as TextChannel;
 
-// const now = new Date(); //! Testing
+const now = new Date(); //! Testing
 
 export const createPollJob = new CronJob(
 	`0 ${config.hour} * * ${config.dayOfWeek - 1}`, // Create poll 24hrs before movie night time
@@ -62,7 +62,6 @@ export const endPollJob = new CronJob(
 		const pollId: string = dbRes[0].messageid;
 
 		const poll = await channel.messages.fetch(pollId);
-		await poll.poll.end();
 
 		const answers = Array.from(poll.poll.answers.values());
 		const totalVotes = answers[0].voteCount + answers[1].voteCount;

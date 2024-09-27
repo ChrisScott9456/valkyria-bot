@@ -19,7 +19,7 @@ const timestampFormatted = (format = 'LLLL') => {
 	return `${timestamp().format(format)} EST`;
 };
 
-const getChannel = async () => (await client.channels.fetch(MOVIE_NIGHT_TEXT_CHANNEL)) as TextChannel;
+export const getChannel = async () => (await client.channels.fetch(MOVIE_NIGHT_TEXT_CHANNEL)) as TextChannel;
 
 const now = new Date(); //! Testing
 
@@ -93,53 +93,57 @@ export const endPollJob = new CronJob(
 				],
 			});
 		} else {
-			/*
-			 * Otherwise, roll movie from movie list and create event
-			 */
-			await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
-
-			const movies = await db<Movie>(DB_TABLES.MOVIE_LIST).select('*');
-
-			let selectedMovie: Movie; // The random movie to be selected from the list
-
-			if (movies.length > 0) {
-				const randomIndex = Math.floor(Math.random() * movies.length);
-				selectedMovie = movies[randomIndex];
-
-				const event: GuildScheduledEventCreateOptions = {
-					name: `Movie Night - ${timestampFormatted('ll')}`,
-					scheduledStartTime: timestamp().toISOString(),
-					scheduledEndTime: timestamp().add(3, 'hours').toISOString(),
-					privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
-					entityType: GuildScheduledEventEntityType.Voice,
-					description: [
-						`### **Tonight's Movie:**\n **${selectedMovie.Title} (${selectedMovie['Release Date'].slice(0, 4)})**`,
-						`### **User:**\n <@${selectedMovie.User}>`,
-						`### **Runtime:**\n ${selectedMovie.Runtime}`,
-						`### **Synopsis:**\n ${selectedMovie.Synopsis}`,
-						`### **IMDB Link:**\n ${selectedMovie['IMDB Link']}`,
-						`### **TMDB Link:**\n ${selectedMovie['TMDB Link']}`,
-					].join('\n'),
-					channel: MOVIE_NIGHT_VOICE_CHANNEL,
-					image: selectedMovie.Poster,
-				};
-
-				const createdEvent = await channel.guild.scheduledEvents.create(event);
-				channel.send(createdEvent.url);
-
-				await db<Movie>(DB_TABLES.MOVIE_LIST).where({ id: selectedMovie.id }).delete();
-			} else {
-				/*
-				 * If there are no movies in the list to roll for, send message to channel
-				 */
-				await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
-				await channel.send({
-					embeds: [new EmbedBuilder().setColor('Red').setTitle('Movie Night').setDescription('There are no movies in the list to roll for movie night!')],
-				});
-			}
+			await rollMovie(channel);
 		}
 	},
 	null,
 	false,
 	'America/New_York'
 );
+
+export async function rollMovie(channel: TextChannel) {
+	/*
+	 * Otherwise, roll movie from movie list and create event
+	 */
+	await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
+
+	const movies = await db<Movie>(DB_TABLES.MOVIE_LIST).select('*');
+
+	let selectedMovie: Movie; // The random movie to be selected from the list
+
+	if (movies.length > 0) {
+		const randomIndex = Math.floor(Math.random() * movies.length);
+		selectedMovie = movies[randomIndex];
+
+		const event: GuildScheduledEventCreateOptions = {
+			name: `Movie Night - ${timestampFormatted('ll')}`,
+			scheduledStartTime: timestamp().toISOString(),
+			scheduledEndTime: timestamp().add(3, 'hours').toISOString(),
+			privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+			entityType: GuildScheduledEventEntityType.Voice,
+			description: [
+				`### **Tonight's Movie:**\n **${selectedMovie.Title} (${selectedMovie['Release Date'].slice(0, 4)})**`,
+				`### **User:**\n <@${selectedMovie.User}>`,
+				`### **Runtime:**\n ${selectedMovie.Runtime}`,
+				`### **Synopsis:**\n ${selectedMovie.Synopsis}`,
+				`### **IMDB Link:**\n ${selectedMovie['IMDB Link']}`,
+				`### **TMDB Link:**\n ${selectedMovie['TMDB Link']}`,
+			].join('\n'),
+			channel: MOVIE_NIGHT_VOICE_CHANNEL,
+			image: selectedMovie.Poster,
+		};
+
+		const createdEvent = await channel.guild.scheduledEvents.create(event);
+		channel.send(createdEvent.url);
+
+		await db<Movie>(DB_TABLES.MOVIE_LIST).where({ id: selectedMovie.id }).delete();
+	} else {
+		/*
+		 * If there are no movies in the list to roll for, send message to channel
+		 */
+		await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
+		await channel.send({
+			embeds: [new EmbedBuilder().setColor('Red').setTitle('Movie Night').setDescription('There are no movies in the list to roll for movie night!')],
+		});
+	}
+}

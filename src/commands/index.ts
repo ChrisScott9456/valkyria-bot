@@ -1,6 +1,7 @@
 import { Command } from '../interfaces/Command';
 import { AddMovieCommand } from './movienight/addmovie';
 import { DeleteMovieCommand } from './movienight/deletemovie';
+import { ForceMovieNightCommand } from './movienight/forcemovienight';
 import { MovieListCommand } from './movienight/movielist';
 import { PingCommand } from './text/ping';
 import { LoopCommand } from './youtube/loop';
@@ -19,6 +20,7 @@ export const Commands = new Map<string, Command>();
 [
 	AddMovieCommand,
 	DeleteMovieCommand,
+	ForceMovieNightCommand,
 	MovieListCommand,
 	LoopCommand,
 	PauseCommand,

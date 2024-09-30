@@ -1,6 +1,5 @@
-import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../../interfaces/Command';
-import { MyClient } from '../../classes/MyClient';
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { Command, RunParams } from '../../interfaces/Command';
 import { replyWrapper } from '../../utils/replyWrapper';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 import axios from 'axios';
@@ -14,7 +13,7 @@ export class AddMovieCommand extends Command {
 		.setDescription('Add a movie to the current list.')
 		.addStringOption((opt) => opt.setName('link').setDescription('A valid link from IMDB or TMDB').setRequired(true));
 
-	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
+	async run({ interaction }: RunParams) {
 		const link = interaction.options.getString('link', true);
 		const isIMDB = validateLinkIMDB(link);
 		const isTMDB = validateLinkTMDB(link);
@@ -100,8 +99,8 @@ export class AddMovieCommand extends Command {
 
 		delete outMovie.User;
 
-		await replyWrapper(
-			{
+		await replyWrapper({
+			message: {
 				embeds: [
 					new EmbedBuilder()
 						.setColor(0x00ff00)
@@ -119,8 +118,8 @@ export class AddMovieCommand extends Command {
 						),
 				],
 			},
-			interaction
-		);
+			interaction,
+		});
 	}
 }
 

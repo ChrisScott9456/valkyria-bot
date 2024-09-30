@@ -1,6 +1,5 @@
-import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../../interfaces/Command';
-import { MyClient } from '../../classes/MyClient';
+import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { Command, RunParams } from '../../interfaces/Command';
 import { replyWrapper } from '../../utils/replyWrapper';
 import { db, DB_TABLES } from '../../lib/knex';
 import { Movie } from '../../interfaces/MovieNight';
@@ -11,7 +10,7 @@ export class MovieListCommand extends Command {
 		.setDescription('Lists the current movie list.')
 		.addBooleanOption((opt) => opt.setName('simple').setDescription('Only display movie titles?'));
 
-	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
+	async run({ interaction }: RunParams) {
 		const simple = interaction.options.getBoolean('simple');
 
 		const movies = await db<Movie>(DB_TABLES.MOVIE_LIST).select('*');
@@ -29,8 +28,8 @@ export class MovieListCommand extends Command {
 					`### **TMDB Link:**\n ${movie['TMDB Link']}`,
 				];
 
-				await replyWrapper(
-					{
+				await replyWrapper({
+					message: {
 						embeds: [
 							new EmbedBuilder()
 								.setColor('Blurple')
@@ -39,16 +38,16 @@ export class MovieListCommand extends Command {
 								.setDescription((simple ? fields.slice(0, 2) : fields).join('\n')), // If simple = true, only display user and title
 						],
 					},
-					interaction
-				);
+					interaction,
+				});
 			}
 		} else {
-			await replyWrapper(
-				{
+			await replyWrapper({
+				message: {
 					embeds: [new EmbedBuilder().setColor(0xff0000).setTitle('Movie List').setDescription('The current movie list is empty!')],
 				},
-				interaction
-			);
+				interaction,
+			});
 		}
 	}
 }

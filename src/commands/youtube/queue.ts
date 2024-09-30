@@ -1,6 +1,6 @@
-import { ChatInputCommandInteraction, EmbedBuilder, ReactionCollector, SlashCommandBuilder } from 'discord.js';
-import { Command, DisTubeCommand } from '../../interfaces/Command';
-import { MyClient } from '../../classes/MyClient';
+import { EmbedBuilder, ReactionCollector, SlashCommandBuilder } from 'discord.js';
+import { Command, DisTubeCommand, RunParams } from '../../interfaces/Command';
+import { client } from '../..';
 import { getProgressBar } from '../../utils/getProgressBar';
 import { Commands } from '..';
 import { EmbedError, EmbedErrorMessages, errorEmbed } from '../../utils/errorEmbed';
@@ -14,21 +14,21 @@ let queueCollector: ReactionCollector;
 export class QueueCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.QUEUE).setDescription('Lists the current queue of songs.');
 
-	async run(client: MyClient, interaction: ChatInputCommandInteraction<'cached'>) {
+	async run({ interaction, channel }: RunParams) {
 		// Clear queue reaction collector
 		if (queueCollector) {
 			queueCollector.stop();
 		}
 
-		const queue = client.distube.getQueue(interaction);
+		const queue = client.distube.getQueue(interaction?.guildId || channel?.guildId);
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
 
 		const song = queue.songs[0]; // The currently playing song
 
 		const timestampStr = `\`${queue.formattedCurrentTime}\`/\`${song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration}\``;
 
-		const reply = await replyWrapper(
-			{
+		const reply = await replyWrapper({
+			message: {
 				embeds: [
 					new EmbedBuilder()
 						.setColor('Blurple')
@@ -60,8 +60,9 @@ export class QueueCommand extends Command {
 						.setFooter({ text: `Source: ${song.uploader.name}` }),
 				],
 			},
-			interaction
-		);
+			interaction,
+			channel,
+		});
 
 		const replyMessage = await reply.fetch();
 
@@ -82,24 +83,24 @@ export class QueueCommand extends Command {
 			try {
 				switch (reaction.emoji.toString()) {
 					case '⏮':
-						await Commands.get(DisTubeCommand.PREVIOUS).run(client, interaction);
+						await Commands.get(DisTubeCommand.PREVIOUS).run({ channel });
 						break;
 					case '⏹':
-						await Commands.get(DisTubeCommand.STOP).run(client, interaction);
+						await Commands.get(DisTubeCommand.STOP).run({ channel });
 						break;
 					case '⏯':
-						await Commands.get(DisTubeCommand.PAUSE).run(client, interaction);
+						await Commands.get(DisTubeCommand.PAUSE).run({ channel });
 						collectorFlag = false;
 						break;
 					case '⏭':
-						await Commands.get(DisTubeCommand.SKIP).run(client, interaction);
+						await Commands.get(DisTubeCommand.SKIP).run({ channel });
 						break;
 					case '🔀':
-						await Commands.get(DisTubeCommand.SHUFFLE).run(client, interaction);
+						await Commands.get(DisTubeCommand.SHUFFLE).run({ channel });
 						collectorFlag = false;
 						break;
 					case '🔁':
-						await Commands.get(DisTubeCommand.LOOP).run(client, interaction);
+						await Commands.get(DisTubeCommand.LOOP).run({ channel });
 						collectorFlag = false;
 						break;
 					default:
@@ -111,7 +112,7 @@ export class QueueCommand extends Command {
 				reaction.users.remove(user);
 
 				if (error instanceof EmbedError) {
-					await replyWrapper(errorEmbed(error.embedMessage), interaction);
+					await replyWrapper({ message: errorEmbed(error.embedMessage), interaction });
 				} else {
 					console.error(error);
 				}

@@ -8,6 +8,7 @@ import { replyWrapper } from './utils/replyWrapper';
 import { createPollJob, endPollJob } from './utils/poll';
 import { APPLICATION_ID, DISCORD_TOKEN } from './lib/envVariables';
 import { createTables } from './lib/knex';
+import { DisTubeCommand } from './interfaces/Command';
 
 // Create a new client instance
 export const client = new MyClient({
@@ -59,9 +60,9 @@ client.on(Events.InteractionCreate, async (interaction: ChatInputCommandInteract
 	}
 
 	try {
-		await command.run(client, interaction);
+		await command.run({ interaction });
 	} catch (error) {
-		await replyWrapper(errorEmbed(error.embedMessage || EmbedErrorMessages.GENERAL_ERROR), interaction);
+		await replyWrapper({ message: errorEmbed(error.embedMessage || EmbedErrorMessages.GENERAL_ERROR), interaction });
 
 		console.error(error);
 	}
@@ -71,7 +72,7 @@ client.on(Events.InteractionCreate, async (interaction: ChatInputCommandInteract
  * Listens to when the current distube queue changes songs
  */
 client.distube.on(DistubeEvents.PLAY_SONG, (queue, song) => {
-	// Display current song
+	Commands.get(DisTubeCommand.QUEUE).run({ channel: queue.textChannel });
 });
 
 /*

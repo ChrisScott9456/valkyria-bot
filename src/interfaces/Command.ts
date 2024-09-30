@@ -1,9 +1,13 @@
-import { CommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
-import { MyClient } from '../classes/MyClient';
+import { ChatInputCommandInteraction, GuildTextBasedChannel, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
+
+export interface RunParams {
+	interaction?: ChatInputCommandInteraction<'cached'>;
+	channel?: GuildTextBasedChannel;
+}
 
 export abstract class Command {
 	abstract readonly slashCommandBuilder: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
-	abstract run(client: MyClient, interaction: CommandInteraction<'cached'>): Promise<void>;
+	abstract run({ interaction, channel }: RunParams): Promise<void>;
 	public aliases: string[];
 }
 

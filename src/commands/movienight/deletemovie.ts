@@ -1,5 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command, RunParams } from '../../interfaces/Command';
+import { Command, RunParamsChat } from '../../interfaces/Command';
 import { replyWrapper } from '../../utils/replyWrapper';
 import { Movie } from '../../interfaces/MovieNight';
 import { db, DB_TABLES } from '../../lib/knex';
@@ -11,7 +11,7 @@ export class DeleteMovieCommand extends Command {
 		.setDescription('Delete a movie from the current list.')
 		.addStringOption((opt) => opt.setName('id').setDescription('The ID of the movie').setRequired(true));
 
-	async run({ interaction }: RunParams) {
+	async run({ interaction }: RunParamsChat) {
 		const id = JSON.parse(interaction.options.getString('id', true));
 
 		const movie = (await db<Movie>(DB_TABLES.MOVIE_LIST).where({ id }))[0];

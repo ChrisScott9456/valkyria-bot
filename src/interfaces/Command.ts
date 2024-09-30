@@ -1,8 +1,16 @@
-import { ChatInputCommandInteraction, GuildTextBasedChannel, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, GuildTextBasedChannel, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
 
 export interface RunParams {
-	interaction?: ChatInputCommandInteraction<'cached'>;
+	interaction?: ChatInputCommandInteraction | ButtonInteraction;
 	channel?: GuildTextBasedChannel;
+}
+
+export interface RunParamsButton extends RunParams {
+	interaction?: ButtonInteraction;
+}
+
+export interface RunParamsChat {
+	interaction?: ChatInputCommandInteraction<'cached'>;
 }
 
 export abstract class Command {

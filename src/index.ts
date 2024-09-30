@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { ChatInputCommandInteraction, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Events, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { Events as DistubeEvents } from 'distube';
 import { Commands } from './commands';
 import { MyClient } from './classes/MyClient';
@@ -47,19 +47,14 @@ client.once(Events.ClientReady, async (readyClient) => {
 });
 
 /*
- * Listens to chat commands and executes run() command
+ * Listens to chat commands and buttons to execute run() command
  */
-client.on(Events.InteractionCreate, async (interaction: ChatInputCommandInteraction<'cached'>) => {
-	if (!interaction.isChatInputCommand()) return;
-
-	const command = Commands.get(interaction.commandName);
-
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
+client.on(Events.InteractionCreate, async (interaction) => {
+	if (!(interaction.isChatInputCommand() || interaction.isButton())) return;
 
 	try {
+		const command = interaction.isChatInputCommand() ? Commands.get(interaction.commandName) : interaction.isButton() ? Commands.get(interaction.customId) : null;
+
 		await command.run({ interaction });
 	} catch (error) {
 		await replyWrapper({ message: errorEmbed(error.embedMessage || EmbedErrorMessages.GENERAL_ERROR), interaction });

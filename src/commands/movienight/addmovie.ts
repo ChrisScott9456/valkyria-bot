@@ -1,5 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command, RunParams } from '../../interfaces/Command';
+import { Command, RunParamsChat } from '../../interfaces/Command';
 import { replyWrapper } from '../../utils/replyWrapper';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 import axios from 'axios';
@@ -13,7 +13,7 @@ export class AddMovieCommand extends Command {
 		.setDescription('Add a movie to the current list.')
 		.addStringOption((opt) => opt.setName('link').setDescription('A valid link from IMDB or TMDB').setRequired(true));
 
-	async run({ interaction }: RunParams) {
+	async run({ interaction }: RunParamsChat) {
 		const link = interaction.options.getString('link', true);
 		const isIMDB = validateLinkIMDB(link);
 		const isTMDB = validateLinkTMDB(link);

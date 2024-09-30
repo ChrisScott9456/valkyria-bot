@@ -1,5 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command, DisTubeCommand, RunParams } from '../../interfaces/Command';
+import { Command, DisTubeCommand, RunParamsChat } from '../../interfaces/Command';
 import { client } from '../..';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 import { replyWrapper } from '../../utils/replyWrapper';
@@ -11,7 +11,7 @@ export class PlayCommand extends Command {
 		.addStringOption((opt) => opt.setName('input').setDescription('A YouTube video or playlist URL, or search terms').setRequired(true))
 		.addBooleanOption((opt) => opt.setName('skip').setDescription('Skip the current song?').setRequired(false));
 
-	async run({ interaction }: RunParams) {
+	async run({ interaction }: RunParamsChat) {
 		const input = interaction.options.getString('input', true);
 		const skip = interaction.options.getBoolean('skip', false) ?? false;
 		const vc = interaction.member?.voice?.channel;

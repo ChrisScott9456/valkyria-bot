@@ -1,4 +1,4 @@
-import { CommandInteraction, MessagePayload, GuildTextBasedChannel, BaseMessageOptions } from 'discord.js';
+import { MessagePayload, GuildTextBasedChannel, BaseMessageOptions, ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
 import { EmbedError, EmbedErrorMessages } from './errorEmbed';
 
 export function replyWrapper({
@@ -7,7 +7,7 @@ export function replyWrapper({
 	channel,
 }: {
 	message: string | MessagePayload | BaseMessageOptions;
-	interaction?: CommandInteraction<'cached'>;
+	interaction?: ChatInputCommandInteraction | ButtonInteraction;
 	channel?: GuildTextBasedChannel;
 }) {
 	if (interaction) {

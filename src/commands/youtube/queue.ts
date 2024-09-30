@@ -1,25 +1,14 @@
-import { EmbedBuilder, ReactionCollector, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { Command, DisTubeCommand, RunParams } from '../../interfaces/Command';
 import { client } from '../..';
 import { getProgressBar } from '../../utils/getProgressBar';
-import { Commands } from '..';
 import { EmbedError, EmbedErrorMessages, errorEmbed } from '../../utils/errorEmbed';
 import { replyWrapper } from '../../utils/replyWrapper';
-
-let queueCollector: ReactionCollector;
-
-//TODO - Replace reactions with "Buttons"
-//TODO - Do setup so it will show the current song playing when it changes songs
 
 export class QueueCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.QUEUE).setDescription('Lists the current queue of songs.');
 
 	async run({ interaction, channel }: RunParams) {
-		// Clear queue reaction collector
-		if (queueCollector) {
-			queueCollector.stop();
-		}
-
 		const queue = client.distube.getQueue(interaction?.guildId || channel?.guildId);
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
 
@@ -27,7 +16,7 @@ export class QueueCommand extends Command {
 
 		const timestampStr = `\`${queue.formattedCurrentTime}\`/\`${song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration}\``;
 
-		const reply = await replyWrapper({
+		await replyWrapper({
 			message: {
 				embeds: [
 					new EmbedBuilder()
@@ -64,61 +53,16 @@ export class QueueCommand extends Command {
 			channel,
 		});
 
-		const replyMessage = await reply.fetch();
+		/*
+		 * Media Buttons
+		 */
+		const previous = new ButtonBuilder().setCustomId(DisTubeCommand.PREVIOUS).setEmoji('⏮').setStyle(ButtonStyle.Secondary);
+		const pause = new ButtonBuilder().setCustomId(DisTubeCommand.PAUSE).setEmoji('⏯').setStyle(ButtonStyle.Secondary);
+		const skip = new ButtonBuilder().setCustomId(DisTubeCommand.SKIP).setEmoji('⏭').setStyle(ButtonStyle.Secondary);
+		const shuffle = new ButtonBuilder().setCustomId(DisTubeCommand.SHUFFLE).setEmoji('🔀').setStyle(ButtonStyle.Secondary);
+		const loop = new ButtonBuilder().setCustomId(DisTubeCommand.LOOP).setEmoji('🔁').setStyle(ButtonStyle.Secondary);
+		const row = new ActionRowBuilder<any>().addComponents(previous, pause, skip, shuffle, loop);
 
-		['⏮', '⏹', '⏯', '⏭', '🔀', '🔁'].forEach((reaction) => {
-			replyMessage.react(reaction);
-		});
-
-		queueCollector = replyMessage.createReactionCollector({
-			filter: (reaction, user) => {
-				return user.id !== replyMessage.author.id;
-			},
-			time: song.duration * 1000,
-		});
-
-		queueCollector.on('collect', async (reaction, user) => {
-			let collectorFlag = true;
-
-			try {
-				switch (reaction.emoji.toString()) {
-					case '⏮':
-						await Commands.get(DisTubeCommand.PREVIOUS).run({ channel });
-						break;
-					case '⏹':
-						await Commands.get(DisTubeCommand.STOP).run({ channel });
-						break;
-					case '⏯':
-						await Commands.get(DisTubeCommand.PAUSE).run({ channel });
-						collectorFlag = false;
-						break;
-					case '⏭':
-						await Commands.get(DisTubeCommand.SKIP).run({ channel });
-						break;
-					case '🔀':
-						await Commands.get(DisTubeCommand.SHUFFLE).run({ channel });
-						collectorFlag = false;
-						break;
-					case '🔁':
-						await Commands.get(DisTubeCommand.LOOP).run({ channel });
-						collectorFlag = false;
-						break;
-					default:
-						return; // Don't stop queue collector if any other reaction added
-				}
-
-				if (collectorFlag) queueCollector.stop();
-			} catch (error) {
-				reaction.users.remove(user);
-
-				if (error instanceof EmbedError) {
-					await replyWrapper({ message: errorEmbed(error.embedMessage), interaction });
-				} else {
-					console.error(error);
-				}
-			}
-
-			if (!collectorFlag) reaction.users.remove(user);
-		});
+		await replyWrapper({ message: { components: [row] }, interaction, channel });
 	}
 }

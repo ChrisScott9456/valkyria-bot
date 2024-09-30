@@ -1,5 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command, RunParams } from '../../interfaces/Command';
+import { Command, RunParamsChat } from '../../interfaces/Command';
 import { replyWrapper } from '../../utils/replyWrapper';
 import { db, DB_TABLES } from '../../lib/knex';
 import { Movie } from '../../interfaces/MovieNight';
@@ -10,7 +10,7 @@ export class MovieListCommand extends Command {
 		.setDescription('Lists the current movie list.')
 		.addBooleanOption((opt) => opt.setName('simple').setDescription('Only display movie titles?'));
 
-	async run({ interaction }: RunParams) {
+	async run({ interaction }: RunParamsChat) {
 		const simple = interaction.options.getBoolean('simple');
 
 		const movies = await db<Movie>(DB_TABLES.MOVIE_LIST).select('*');

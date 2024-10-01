@@ -9,6 +9,7 @@ import { createPollJob, endPollJob } from './utils/poll';
 import { APPLICATION_ID, DISCORD_TOKEN } from './lib/envVariables';
 import { createTables } from './lib/knex';
 import { DisTubeCommand } from './interfaces/Command';
+import { setDefaultPresence } from './utils/defaultPresence';
 
 // Create a new client instance
 export const client = new MyClient({
@@ -66,9 +67,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
 /*
  * Listens to when the current distube queue changes songs
  */
-client.distube.on(DistubeEvents.PLAY_SONG, (queue, song) => {
-	Commands.get(DisTubeCommand.QUEUE).run({ channel: queue.textChannel });
+client.distube.on(DistubeEvents.PLAY_SONG, async (queue, song) => {
+	await Commands.get(DisTubeCommand.QUEUE).run({ channel: queue.textChannel });
+
+	client.user.setPresence({ status: 'online', activities: [{ name: song.name, type: 0, state: song.url }] });
 });
+
+client.distube.on(DistubeEvents.FINISH, setDefaultPresence);
+client.distube.on(DistubeEvents.DELETE_QUEUE, setDefaultPresence);
 
 /*
  * Listens to and logs any errors that occur
@@ -79,4 +85,5 @@ client.on(Events.Error, (error) => {
 
 client.distube.on(DistubeEvents.ERROR, (error) => {
 	console.error(error);
+	setDefaultPresence();
 });

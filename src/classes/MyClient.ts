@@ -1,14 +1,8 @@
 import { YouTubePlugin } from '@distube/youtube';
-import { Client, ClientOptions, PresenceData } from 'discord.js';
+import { Client, ClientOptions } from 'discord.js';
 import DisTube from 'distube';
-
-import * as fs from 'fs';
-import * as yaml from 'js-yaml';
 import { DISCORD_TOKEN } from '../lib/envVariables';
-
-// Load and parse the YAML file
-const fileContents = fs.readFileSync('config/richPresence.yaml', 'utf8');
-const config: PresenceData = yaml.load(fileContents);
+import { setDefaultPresence } from '../utils/defaultPresence';
 
 export class MyClient extends Client {
 	distube = new DisTube(this, {
@@ -40,6 +34,6 @@ export class MyClient extends Client {
 	async initialize() {
 		await this.login(DISCORD_TOKEN);
 
-		this.user.setPresence(config);
+		setDefaultPresence();
 	}
 }

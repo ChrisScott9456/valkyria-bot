@@ -4,14 +4,22 @@ import { client } from '../..';
 import { replyWrapper } from '../../utils/replyWrapper';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 
-//TODO - Add skipping to specific place in queue
 export class SkipCommand extends Command {
 	public aliases: string[] = ['next'];
-	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.SKIP).setDescription('Skips to the next song.');
+	readonly slashCommandBuilder = new SlashCommandBuilder()
+		.setName(DisTubeCommand.SKIP)
+		.setDescription('Skips to the next song.')
+		.addNumberOption((opt) => opt.setName('position').setDescription('The specific position of a song in the queue you want to skip to'));
 
 	async run({ interaction, channel }: RunParams) {
 		const queue = client.distube.getQueue(interaction || channel);
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
+
+		let position = 1;
+
+		if (interaction.isChatInputCommand()) {
+			position = interaction.options.getNumber('position');
+		}
 
 		const song = queue.songs[0];
 
@@ -23,7 +31,7 @@ export class SkipCommand extends Command {
 			await client.distube.stop(interaction);
 			title = 'Stopped';
 		} else {
-			await client.distube.skip(interaction);
+			await client.distube.jump(interaction, position);
 		}
 
 		await replyWrapper({

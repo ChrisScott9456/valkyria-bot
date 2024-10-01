@@ -2,7 +2,7 @@ import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { Command, DisTubeCommand, RunParamsChat } from '../../interfaces/Command';
 import { client } from '../..';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
-import { replyWrapper } from '../../utils/replyWrapper';
+import { isYouTubePlaylist } from '../../utils/isYouTubePlaylist';
 
 export class PlayCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder()
@@ -18,6 +18,8 @@ export class PlayCommand extends Command {
 
 		if (!vc) throw new EmbedError(EmbedErrorMessages.VOICE_CHANNEL_REQUIRED);
 
+		await interaction.reply(`Queueing the ${isYouTubePlaylist(input) ? 'playlist' : 'song'}...`);
+
 		await client.distube
 			.play(vc, input, {
 				skip,
@@ -32,16 +34,14 @@ export class PlayCommand extends Command {
 		const queue = client.distube.getQueue(interaction);
 		const song = queue.songs[queue.songs.length - 1];
 
-		await replyWrapper({
-			message: {
-				embeds: [
-					new EmbedBuilder()
-						.setColor('Blurple')
-						.setTitle('Queued')
-						.setDescription(`**[${song.name || song.url}](${song.url})**\n`),
-				],
-			},
-			interaction,
+		await interaction.editReply({
+			content: null,
+			embeds: [
+				new EmbedBuilder()
+					.setColor('Blurple')
+					.setTitle('Queued')
+					.setDescription(`**[${song.name || song.url}](${song.url})**\n`),
+			],
 		});
 	}
 }

@@ -1,4 +1,4 @@
-import { ButtonInteraction, ChatInputCommandInteraction, GuildTextBasedChannel, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, GuildTextBasedChannel, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, Snowflake } from 'discord.js';
 
 export interface RunParams {
 	interaction?: ChatInputCommandInteraction | ButtonInteraction;
@@ -29,4 +29,14 @@ export enum DisTubeCommand {
 	SHUFFLE = 'shuffle',
 	SKIP = 'skip',
 	STOP = 'stop',
+}
+
+export enum PaginationCommands {
+	PREVIOUS_PAGE = 'previous_page',
+	NEXT_PAGE = 'next_page',
+}
+
+export interface PaginationCustomId {
+	id: PaginationCommands;
+	page: number;
 }

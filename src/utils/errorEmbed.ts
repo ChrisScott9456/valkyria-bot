@@ -1,4 +1,4 @@
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, InteractionReplyOptions } from 'discord.js';
 
 export enum EmbedErrorMessages {
 	GENERAL_ERROR = 'There was an error executing that command!',
@@ -18,8 +18,12 @@ export class EmbedError extends Error {
 	}
 }
 
-export function errorEmbed(errorMessage: EmbedErrorMessages) {
+export function errorEmbed(errorMessage: EmbedErrorMessages, ephemeral: boolean = true): InteractionReplyOptions {
+	// Always publicly show GENERAL_ERROR
+	if (errorMessage === EmbedErrorMessages.GENERAL_ERROR) ephemeral = false;
+
 	return {
+		ephemeral, // If true, only display to the user
 		embeds: [new EmbedBuilder().setColor(0xff0000).setDescription(`**${errorMessage}**`)],
 	};
 }

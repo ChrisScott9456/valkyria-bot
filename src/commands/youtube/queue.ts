@@ -1,20 +1,26 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command, DisTubeCommand, RunParams } from '../../interfaces/Command';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, SlashCommandBuilder, Snowflake } from 'discord.js';
+import { Command, DisTubeCommand, PaginationCommands, RunParams } from '../../interfaces/Command';
 import { client } from '../..';
-import { getProgressBar } from '../../utils/getProgressBar';
-import { EmbedError, EmbedErrorMessages, errorEmbed } from '../../utils/errorEmbed';
+import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
 import { replyWrapper } from '../../utils/replyWrapper';
+import { QUEUE_PAGE_COUNT } from '../../lib/envVariables';
+import { getProgressBar } from '../../utils/getProgressBar';
 
 export class QueueCommand extends Command {
 	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.QUEUE).setDescription('Lists the current queue of songs.');
 
-	async run({ interaction, channel }: RunParams) {
+	public async run({ interaction, channel }: RunParams, page = 1) {
 		const queue = client.distube.getQueue(interaction?.guildId || channel?.guildId);
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
 
-		const song = queue.songs[0]; // The currently playing song
+		const sliceQueue = queue.songs.slice(1);
 
+		const song = queue.songs[0]; // The currently playing song
 		const timestampStr = `\`${queue.formattedCurrentTime}\`/\`${song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration}\``;
+
+		const startCount = (page - 1) * QUEUE_PAGE_COUNT;
+		const endCount = page * QUEUE_PAGE_COUNT;
+		const maxPage = Math.ceil(sliceQueue.length / QUEUE_PAGE_COUNT);
 
 		await replyWrapper({
 			message: {
@@ -28,16 +34,18 @@ export class QueueCommand extends Command {
 							[
 								// Song name and hyperlink
 								`**[${song.name || song.url}](${song.url})**\n`,
+
 								// Display current time left on current song from total song length
 								`${getProgressBar(20, queue.currentTime / song.duration)} ${timestampStr}`,
+
 								// If there are any other songs in the queue, display list
-								queue.songs.slice(1).length > 0
+								queue.songs.length > 0
 									? `### **Queue:**\n${
 											queue.songs
-												.slice(1) // Ignore current song
+												.slice(startCount, endCount) // First 20 songs in the list
 												.map(
 													(song, i) =>
-														`**${i + 1}.** [${song.name || song.url}](${song.url}) \`[${
+														`**${i + 1 + startCount}.** [${song.name || song.url}](${song.url}) \`[${
 															song.stream.playFromSource ? song.formattedDuration : song.stream?.['song']?.formattedDuration
 														}]\``
 												)
@@ -57,12 +65,36 @@ export class QueueCommand extends Command {
 		 * Media Buttons
 		 */
 		const previous = new ButtonBuilder().setCustomId(DisTubeCommand.PREVIOUS).setEmoji('⏮').setStyle(ButtonStyle.Secondary);
+		const stop = new ButtonBuilder().setCustomId(DisTubeCommand.STOP).setEmoji('⏹').setStyle(ButtonStyle.Secondary);
 		const pause = new ButtonBuilder().setCustomId(DisTubeCommand.PAUSE).setEmoji('⏯').setStyle(ButtonStyle.Secondary);
 		const skip = new ButtonBuilder().setCustomId(DisTubeCommand.SKIP).setEmoji('⏭').setStyle(ButtonStyle.Secondary);
 		const shuffle = new ButtonBuilder().setCustomId(DisTubeCommand.SHUFFLE).setEmoji('🔀').setStyle(ButtonStyle.Secondary);
-		const loop = new ButtonBuilder().setCustomId(DisTubeCommand.LOOP).setEmoji('🔁').setStyle(ButtonStyle.Secondary);
-		const row = new ActionRowBuilder<any>().addComponents(previous, pause, skip, shuffle, loop);
+		// const loop = new ButtonBuilder().setCustomId(DisTubeCommand.LOOP).setEmoji('🔁').setStyle(ButtonStyle.Secondary);
 
-		await replyWrapper({ message: { components: [row] }, interaction, channel });
+		const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(previous, stop, pause, skip, shuffle);
+
+		const components = [row];
+
+		/*
+		 * Pagination select
+		 */
+		if (sliceQueue.length > QUEUE_PAGE_COUNT) {
+			const previousPage = new ButtonBuilder()
+				.setCustomId(JSON.stringify({ id: PaginationCommands.PREVIOUS_PAGE, page }))
+				.setEmoji('⬅')
+				.setStyle(ButtonStyle.Primary)
+				.setDisabled(page === 1);
+			const pageCount = new ButtonBuilder().setCustomId('page_count').setLabel(`Page: ${page} of ${maxPage}`).setStyle(ButtonStyle.Secondary).setDisabled(true);
+			const nextPage = new ButtonBuilder()
+				.setCustomId(JSON.stringify({ id: PaginationCommands.NEXT_PAGE, page, maxPage }))
+				.setEmoji('➡')
+				.setStyle(ButtonStyle.Primary)
+				.setDisabled(page >= maxPage);
+
+			const rowTwo = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(previousPage, pageCount, nextPage);
+			components.push(rowTwo);
+		}
+
+		await replyWrapper({ message: { components }, interaction, channel });
 	}
 }

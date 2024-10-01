@@ -9,7 +9,7 @@
 		"build": "tsc",
 		"docker-build": "docker build -t discord-bot .",
 		"docker-image": "docker save -o discord-bot.tar discord-bot:latest",
-		"docker-run": "docker run --env-file .env -d --name my-discord-bot discord-bot"
+		"docker": "npm run docker-build && npm run docker-image"
 	},
 	"author": "ChrisScott9456",
 	"license": "ISC",

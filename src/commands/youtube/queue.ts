@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, SlashCommandBuilder, Snowflake } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, EmbedBuilder, MessageActionRowComponentBuilder, SlashCommandBuilder, Snowflake } from 'discord.js';
 import { Command, DisTubeCommand, PaginationCommands, RunParams } from '../../interfaces/Command';
 import { client } from '../..';
 import { EmbedError, EmbedErrorMessages } from '../../utils/errorEmbed';
@@ -6,12 +6,27 @@ import { replyWrapper } from '../../utils/replyWrapper';
 import { QUEUE_PAGE_COUNT } from '../../lib/envVariables';
 import { getProgressBar } from '../../utils/getProgressBar';
 
+//TODO - Add simple option to only output details of current song (for next playing song)
+//TODO - Add playlist info in queue output (if applicable)
 export class QueueCommand extends Command {
-	readonly slashCommandBuilder = new SlashCommandBuilder().setName(DisTubeCommand.QUEUE).setDescription('Lists the current queue of songs.');
+	readonly slashCommandBuilder = new SlashCommandBuilder()
+		.setName(DisTubeCommand.QUEUE)
+		.setDescription('Lists the current queue of songs.')
+		.addBooleanOption((opt) => opt.setName('simple').setDescription('Only display the currently playing song?').setRequired(false));
 
-	public async run({ interaction, channel }: RunParams, page = 1) {
+	public async run({ interaction, channel }: RunParams, page = 1, simple = false) {
 		const queue = client.distube.getQueue(interaction?.guildId || channel?.guildId);
 		if (!queue) throw new EmbedError(EmbedErrorMessages.EMPTY_QUEUE);
+
+		let simpleFlag;
+
+		if (interaction) {
+			if (interaction instanceof ChatInputCommandInteraction) {
+				simpleFlag = interaction.options.getBoolean('simple') || simple;
+			}
+
+			await interaction.reply('Loading Queue...');
+		}
 
 		const sliceQueue = queue.songs.slice(1);
 
@@ -39,9 +54,9 @@ export class QueueCommand extends Command {
 								`${getProgressBar(20, queue.currentTime / song.duration)} ${timestampStr}`,
 
 								// If there are any other songs in the queue, display list
-								queue.songs.length > 0
+								!simpleFlag && sliceQueue.length > 0
 									? `### **Queue:**\n${
-											queue.songs
+											sliceQueue
 												.slice(startCount, endCount) // First 20 songs in the list
 												.map(
 													(song, i) =>
@@ -58,7 +73,7 @@ export class QueueCommand extends Command {
 				],
 			},
 			interaction,
-			channel,
+			channel: channel || interaction.channel,
 		});
 
 		/*
@@ -78,7 +93,7 @@ export class QueueCommand extends Command {
 		/*
 		 * Pagination select
 		 */
-		if (sliceQueue.length > QUEUE_PAGE_COUNT) {
+		if (!simpleFlag && sliceQueue.length > QUEUE_PAGE_COUNT) {
 			const previousPage = new ButtonBuilder()
 				.setCustomId(JSON.stringify({ id: PaginationCommands.PREVIOUS_PAGE, page }))
 				.setEmoji('⬅')
@@ -95,6 +110,6 @@ export class QueueCommand extends Command {
 			components.push(rowTwo);
 		}
 
-		await replyWrapper({ message: { components }, interaction, channel });
+		await replyWrapper({ message: { components }, channel: channel || interaction.channel });
 	}
 }

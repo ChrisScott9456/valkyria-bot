@@ -10,14 +10,14 @@ export function replyWrapper({
 	interaction?: ChatInputCommandInteraction | ButtonInteraction;
 	channel?: GuildTextBasedChannel;
 }) {
-	if (interaction) {
+	if (channel) {
+		return channel.send(message);
+	} else if (interaction) {
 		if (interaction.replied || interaction.deferred) {
 			return interaction.followUp(message);
 		} else {
 			return interaction.reply(message);
 		}
-	} else if (channel) {
-		return channel.send(message);
 	} else {
 		throw new EmbedError(EmbedErrorMessages.GENERAL_ERROR);
 	}

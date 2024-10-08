@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { Events, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { EmbedBuilder, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { Events as DistubeEvents } from 'distube';
 import { Commands } from './commands';
 import { MyClient } from './classes/MyClient';
-import { EmbedError, EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
+import { EmbedErrorMessages, errorEmbed } from './utils/errorEmbed';
 import { replyWrapper } from './utils/replyWrapper';
 import { createPollJob, endPollJob } from './utils/poll';
 import { APPLICATION_ID, DISCORD_TOKEN } from './lib/envVariables';
@@ -96,6 +96,38 @@ client.distube.on(DistubeEvents.PLAY_SONG, async (queue, song) => {
 	await Commands.get(DisTubeCommand.QUEUE).run({ channel: queue.textChannel });
 
 	client.user.setPresence({ status: 'online', activities: [{ name: song.name, type: 0, state: song.url }] });
+});
+
+/*
+ * Listens for individual songs added to queue
+ */
+client.distube.on(DistubeEvents.ADD_SONG, async (queue, song) => {
+	queue.textChannel.send({
+		embeds: [
+			new EmbedBuilder()
+				.setColor('Blurple')
+				.setTitle('Queued Song')
+				.setThumbnail(song.thumbnail)
+				.setAuthor({ name: song.member.displayName, iconURL: song.member.avatarURL() })
+				.setDescription(`**[${song.name || song.url}](${song.url})**\n`),
+		],
+	});
+});
+
+/*
+ * Listens for playlists added to queue
+ */
+client.distube.on(DistubeEvents.ADD_LIST, async (queue, playlist) => {
+	queue.textChannel.send({
+		embeds: [
+			new EmbedBuilder()
+				.setColor('Blurple')
+				.setTitle('Queued Playlist')
+				.setThumbnail(playlist.thumbnail)
+				.setAuthor({ name: playlist.member.displayName, iconURL: playlist.member.avatarURL() })
+				.setDescription(`**[${playlist.name || playlist.url}](${playlist.url})**\n`),
+		],
+	});
 });
 
 client.distube.on(DistubeEvents.FINISH, setDefaultPresence);

@@ -14,13 +14,15 @@ export class PreviousCommand extends Command {
 
 		await queue.previous();
 
-		const song = queue.previousSongs[0];
+		const song = queue.previousSongs[queue.previousSongs.length - 1];
 		await replyWrapper({
 			message: {
 				embeds: [
 					new EmbedBuilder()
 						.setColor('Blurple')
 						.setTitle('Previous')
+						.setThumbnail(song.thumbnail)
+						.setAuthor({ name: song.member.displayName, iconURL: song.member.avatarURL() })
 						.setDescription(`**[${song.name || song.url}](${song.url})**\n`),
 				],
 			},

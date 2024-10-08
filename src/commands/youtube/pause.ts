@@ -27,6 +27,8 @@ export class PauseCommand extends Command {
 					new EmbedBuilder()
 						.setColor('Blurple')
 						.setTitle(title)
+						.setThumbnail(song.thumbnail)
+						.setAuthor({ name: song.member.displayName, iconURL: song.member.avatarURL() })
 						.setDescription(`**[${song.name || song.url}](${song.url})**\n`),
 				],
 			},

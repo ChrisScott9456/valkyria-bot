@@ -72,29 +72,32 @@ export const endPollJob = new CronJob(
 		if (totalVotes < config.requiredVotes) {
 			await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
 			await channel.send({
-				embeds: [new EmbedBuilder().setColor('Red').setTitle('Movie Night').setDescription(`There weren't enough votes!`)],
-			});
-			return;
-		}
-
-		const failure = answers[1].voteCount >= config.failureVotes; // If number of "No" votes exceeds failureVote limit, cancel movie night
-
-		/*
-		 * If too many "No" votes, send message to channel
-		 */
-		if (failure) {
-			await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
-			await channel.send({
 				embeds: [
-					new EmbedBuilder()
-						.setColor('Red')
-						.setTitle('Movie Night Cancelled!')
-						.setDescription(`Not enough "Yes" votes for Movie Night - ${timestampFormatted('ll')}`),
+					new EmbedBuilder().setColor('Red').setTitle('Movie Night').setDescription(`There weren't enough votes!\n\n**Expected:** ${config.requiredVotes}\n**Received:** ${totalVotes}`),
 				],
 			});
+			return;
 		} else {
-			await rollMovie(channel);
+			const failure = answers[1].voteCount >= config.failureVotes; // If number of "No" votes exceeds failureVote limit, cancel movie night
+
+			/*
+			 * If too many "No" votes, send message to channel
+			 */
+			if (failure) {
+				await channel.send(`<@&${MOVIE_NIGHT_ROLE}>`);
+				await channel.send({
+					embeds: [
+						new EmbedBuilder()
+							.setColor('Red')
+							.setTitle('Movie Night Cancelled!')
+							.setDescription(`Too many "No" votes!\n\n**Limit:** ${config.failureVotes}\n**Received:** ${answers[1].voteCount}`),
+					],
+				});
+			} else {
+				await rollMovie(channel);
+			}
 		}
+		await poll.poll.end();
 	},
 	null,
 	false,

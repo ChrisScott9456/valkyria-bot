@@ -15,7 +15,14 @@ import { QueueCommand } from './commands/youtube/queue';
 
 // Create a new client instance
 export const client = new MyClient({
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessageReactions],
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildVoiceStates,
+		GatewayIntentBits.GuildMessageReactions,
+		GatewayIntentBits.GuildMessagePolls,
+	],
 });
 
 // Construct and prepare an instance of the REST module

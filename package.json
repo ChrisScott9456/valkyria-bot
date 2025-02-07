@@ -14,25 +14,25 @@
 	"author": "ChrisScott9456",
 	"license": "ISC",
 	"dependencies": {
-		"@discordjs/opus": "^0.9.0",
+		"@discordjs/opus": "^0.10.0",
 		"@distube/youtube": "^1.0.4",
-		"@distube/ytdl-core": "^4.14.4",
-		"@types/axios": "^0.14.0",
-		"axios": "^1.7.5",
-		"cron": "^3.1.7",
-		"discord.js": "^14.15.3",
-		"distube": "^5.0.2",
-		"dotenv": "^16.4.5",
+		"@distube/ytdl-core": "^4.16.0",
+		"@types/axios": "^0.14.4",
+		"axios": "^1.7.9",
+		"cron": "^3.5.0",
+		"discord.js": "^14.17.3",
+		"distube": "^5.0.4",
+		"dotenv": "^16.4.7",
 		"js-yaml": "^4.1.0",
 		"knex": "^3.1.0",
 		"moment": "^2.30.1",
-		"sodium-native": "^4.1.1",
+		"sodium-native": "^4.3.1",
 		"sqlite3": "^5.1.7",
-		"typescript": "^5.5.4"
+		"typescript": "^5.7.3"
 	},
 	"devDependencies": {
-		"@types/node": "^22.1.0",
-		"nodemon": "^3.1.4",
+		"@types/node": "^22.13.1",
+		"nodemon": "^3.1.9",
 		"ts-node": "^10.9.2"
 	}
 }

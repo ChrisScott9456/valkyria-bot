@@ -35,7 +35,7 @@ export class MovieListCommand extends Command {
 								.setColor('Blurple')
 								.setTitle('Movie List')
 								.setThumbnail(movie.Poster)
-								.setDescription((simple ? fields.slice(0, 2) : fields).join('\n')), // If simple = true, only display user and title
+								.setDescription((simple ? fields.slice(0, 3) : fields).join('\n')), // If simple = true, only display user and title
 						],
 					},
 					interaction,
